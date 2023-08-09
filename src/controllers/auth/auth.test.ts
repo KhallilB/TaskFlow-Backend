@@ -3,12 +3,12 @@ import mongoose from "mongoose";
 import app from "../../app";
 import User from "../../models/User";
 
-describe("Registration v1", () => {
-  // Delete user after test are done
-  afterAll(async () => {
-    await User.deleteOne({ username: "testuser" });
-  });
+// Delete user after test suites are done
+afterAll(async () => {
+  await User.deleteOne({ username: "testuser" });
+});
 
+describe("Registration v1", () => {
   it("should register a new user", async () => {
     await mongoose.connect(process.env.MONGO_URI!);
 
@@ -66,5 +66,23 @@ describe("Registration v1", () => {
       .send(userData);
 
     expect(response.status).toBe(500);
+  });
+});
+
+describe("Login v1", () => {
+  it("should login a user", async () => {
+    const userData = {
+      email: "test@example.com",
+      password: "testpassword",
+    };
+    
+    const response = await request(app)
+      .post("/api/v1/auth/login")
+      .send({ email: userData.email, password: userData.password });
+
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.token).toBeDefined();
+    expect(response.body.data).toBeDefined();
   });
 });
