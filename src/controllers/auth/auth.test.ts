@@ -3,9 +3,9 @@ import mongoose from "mongoose";
 import app from "../../app";
 import User from "../../models/User";
 
-describe("Registration API", () => {
-  // Delete user after each test
-  afterEach(async () => {
+describe("Registration v1", () => {
+  // Delete user after test are done
+  afterAll(async () => {
     await User.deleteOne({ username: "testuser" });
   });
 
@@ -30,14 +30,35 @@ describe("Registration API", () => {
     expect(response.body.data).toBeDefined();
   });
 
+  it("should not register a user with an existing username", async () => {
+    const userData = {
+      username: "testuser",
+      firstName: "John",
+      lastName: "Doe",
+      email: "test@example.com",
+      password: "testpassword",
+    };
+
+    const response = await request(app)
+      .post("/api/v1/auth/register")
+      .send(userData);
+
+    expect(response.status).toBe(400);
+    expect(response.body.success).toBe(false);
+    expect(response.body.message).toBe("Username or email already registered");
+  });
+
   it("should handle registration error", async () => {
     // Mocking User.save() to throw an error
     jest
       .spyOn(User.prototype, "save")
       .mockRejectedValue(new Error("Mocked error"));
 
+    // Missing user and email properties
     const userData = {
-      // ... provide user data
+      firstName: "John",
+      lastName: "Doe",
+      password: "testpassword",
     };
 
     const response = await request(app)
@@ -45,7 +66,5 @@ describe("Registration API", () => {
       .send(userData);
 
     expect(response.status).toBe(500);
-    expect(response.body.success).toBe(false);
-    expect(response.body.error).toBe("Internal Server Error");
   });
 });

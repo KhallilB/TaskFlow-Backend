@@ -12,6 +12,15 @@ export const register = async (
   const { username, firstName, lastName, email, password } = req.body;
 
   try {
+    // Check username and email are registered
+    let foundUser = await User.findOne({ $or: [{ username }, { email }] });
+    if (foundUser) {
+      return res.status(400).json({
+        success: false,
+        message: "Username or email already registered",
+      });
+    }
+
     // Create user
     const user = new User({
       username,
@@ -33,6 +42,7 @@ export const register = async (
       data: user,
     });
   } catch (error: any) {
+    console.log(error);
     next(error);
   }
 };
