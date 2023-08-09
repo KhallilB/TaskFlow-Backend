@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import User from "../models/User";
+import User from "../../models/User";
 
 // @desc    Register a new user
 // @route   POST /api/v1/auth/register

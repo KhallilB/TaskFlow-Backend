@@ -57,7 +57,7 @@ const userSchema = new Schema<IUser, IUserModel>(
     role: {
       type: String,
       enum: ["admin", "leader", "member"], // Customize roles as needed
-      default: "employee", // Set a default role
+      default: "member", // Set a default role
     },
     notificationPreferences: {
       email: {

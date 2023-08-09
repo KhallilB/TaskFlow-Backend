@@ -52,7 +52,7 @@ npm start
 - Authentication and user management using JWT.
 - CRUD operations for projects, tasks, comments, and notifications.
 - Role-based access control (RBAC) to manage user permissions.
-- GraphQL API documentation for clear and comprehensive endpoint information.
+- API documentation for clear and comprehensive endpoint information.
 - Secure password hashing and token-based authentication.
 
 ## API Documentation
