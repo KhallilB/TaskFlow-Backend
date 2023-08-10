@@ -20,8 +20,9 @@ Welcome to the backend repository of TaskFlow, an enterprise task management sys
 
 ### Prerequisites
 
-- Node.js (recommended version: X.X.X)
+- Node.js (recommended version: 16.15.0)
 - npm or yarn package manager
+- Docker
 - MongoDB 
 
 ### Installation
@@ -43,9 +44,15 @@ Configure environment variables:
 
 - Copy .env.example to .env and provide the necessary configuration values.
 
-Run the server:
+#### Development
+Build the development container:
 ```sh
-npm start
+make dev-build
+```
+
+Start the server
+```sh
+make dev-run 
 ```
 
 ## Features

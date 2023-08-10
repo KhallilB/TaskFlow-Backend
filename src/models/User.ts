@@ -54,11 +54,11 @@ const userSchema = new Schema<IUser, IUserModel>(
       type: String,
       required: true,
     },
-    role: {
-      type: String,
-      enum: ["admin", "leader", "member"], // Customize roles as needed
-      default: "member", // Set a default role
-    },
+    // role: {
+    //   type: String,
+    //   enum: ["admin", "leader", "member"], // Customize roles as needed
+    //   default: "member", // Set a default role
+    // },
     notificationPreferences: {
       email: {
         type: Boolean,
