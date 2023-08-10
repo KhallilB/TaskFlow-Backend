@@ -4,7 +4,7 @@
   "description": "Welcome to the backend repository of TaskFlow, an enterprise task management system. This repository contains the server-side components of the TaskFlow application, built with Node.js, Express.js, JWT authentication, MongoDB as the database, Mongoose as the ODM, and GraphQL for API documentation.",
   "main": "src/index.ts",
   "scripts": {
-    "test": "npx jest --coverage",
+    "test": "npx jest --coverage --detectOpenHandles",
     "build": "npx tsc && node ./dist/index.js",
     "start": "node dist/index.js",
     "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/index.js\""

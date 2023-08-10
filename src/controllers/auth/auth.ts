@@ -42,7 +42,6 @@ export const register = async (
       data: user,
     });
   } catch (error: any) {
-    console.log(error);
     next(error);
   }
 };
@@ -56,14 +55,6 @@ export const login = async (
   next: NextFunction
 ) => {
   const { email, password } = req.body;
-
-  // Validate email and password
-  if (!email || !password) {
-    return next({
-      message: "Please provide an email and password",
-      statusCode: 400,
-    });
-  }
 
   try {
     const user = await User.findOne({ email });
