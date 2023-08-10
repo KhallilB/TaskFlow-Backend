@@ -1,24 +1,28 @@
 import request from "supertest";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
+import { afterThis } from "jest-after-this";
 import app from "../../app";
 import User from "../../models/User";
 
-// Delete user after test suites are done
-afterAll(async () => {
-  await User.deleteOne({ username: "testuser" });
+const userData = {
+  username: "testuser",
+  firstName: "John",
+  lastName: "Doe",
+  email: "test@example.com",
+  password: "testpassword",
+};
+
+beforeAll(async () => {
+  await mongoose.connect(process.env.MONGO_URI!);
 });
 
-describe("User model", () => {
+afterAll(async () => {
+  await mongoose.connection.close();
+});
+
+describe("User Model", () => {
   it("should return error on bcrypt hash pre save hook", async () => {
-    const userData = {
-      username: "testuser",
-      firstName: "John",
-      lastName: "Doe",
-      email: "test@example.com",
-      password: "testpassword",
-    };
-    
     // Mocking bcrypt.hash() to throw an error
     jest.spyOn(bcrypt, "hash").mockImplementationOnce(() => {
       throw new Error("Mocked error");
@@ -27,17 +31,22 @@ describe("User model", () => {
     const user = new User(userData);
     await expect(user.save()).rejects.toThrow("Mocked error");
   });
+
+  it("should hash password before saving", async () => {
+    const user = new User(userData);
+    await user.save();
+
+    expect(user.password).not.toBe(userData.password);
+
+    afterThis(() => {
+      user.deleteOne({ email: userData.email });
+    });
+  });
 });
 
-describe("Registration v1", () => {
-  const userData = {
-    username: "testuser",
-    firstName: "John",
-    lastName: "Doe",
-    email: "test@example.com",
-    password: "testpassword",
-  };
+//------------------------------------------------------------
 
+describe("Registration v1", () => {
   it("should register a new user", async () => {
     await mongoose.connect(process.env.MONGO_URI!);
 
@@ -80,6 +89,7 @@ describe("Login v1", () => {
     email: "test@example.com",
     password: "testpassword",
   };
+
   it("should login a user", async () => {
     const response = await request(app)
       .post("/api/v1/auth/login")
@@ -116,5 +126,10 @@ describe("Login v1", () => {
     const response = await request(app).post("/api/v1/auth/login").send({});
 
     expect(response.status).toBe(500);
+  });
+
+  // Delete user after all tests
+  afterThis(() => {
+    User.deleteOne({ email: userData.email });
   });
 });
