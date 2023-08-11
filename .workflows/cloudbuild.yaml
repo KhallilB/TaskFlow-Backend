@@ -1,0 +1,71 @@
+steps:
+  # Install dependencies
+  - name: "gcr.io/cloud-builders/npm"
+    args: ["install"]
+
+  # Create .env file
+  - name: "gcr.io/cloud-builders/npm"
+    args: ["run", "create-env"]
+    env:
+      - "MONGO_URI=$_MONGO_URI"
+      - "JWT_SECRET=$_JWT_SECRET"
+      - "JWT_EXPIRE=$_JWT_EXPIRE"
+
+  # Run tests
+  - name: "gcr.io/cloud-builders/npm"
+    args: ["run", "test"]
+  
+  # Code coverage
+  - name: "gcr.io/cloud-builders/curl"
+    entrypoint: bash
+    args: ["-c", "bash <(curl -s https://codecov.io/bash)"]
+    env:
+      - "VCS_COMMIT_ID=$COMMIT_SHA"
+      - "VCS_BRANCH_NAME=$BRANCH_NAME"
+      - "VCS_PULL_REQUEST=$_PR_NUMBER"
+      - "CI_BUILD_ID=$BUILD_ID"
+      - "CODECOV_TOKEN=$_CODECOV_TOKEN"
+
+  # Build the Docker image
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      [
+        "build",
+        "--cache-from",
+        "$_TASK_FLOW_IMAGE",
+        "-f",
+        "Dockerfile",
+        "--target",
+        "prod",
+        "-t",
+        "$_TASK_FLOW_IMAGE",
+        ".",
+      ]
+
+  # Push the Docker image to Artifact Registry
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["push", "$_TASK_FLOW_IMAGE"]
+
+  # Deploy container image to Cloud Run
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: gcloud
+    args:
+      [
+        "run",
+        "deploy",
+        "backend-image",
+        "--image",
+        "$_TASK_FLOW_IMAGE",
+        "--region",
+        "us-west3",
+      ]
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+
+substitutions:
+  _TASK_FLOW_IMAGE: "us-west1-docker.pkg.dev/task-flow-backend-services/task-flow-backend-repo/backend-image:latest"
+
+images:
+  # Define the Docker image to be pushed to Artifact Registry
+  - "us-west1-docker.pkg.dev/task-flow-backend-services/task-flow-backend-repo/backend-image:latest"

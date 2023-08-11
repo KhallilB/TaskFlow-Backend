@@ -4,9 +4,9 @@ import fs from "fs";
 import path from "path";
 import morgan from "morgan";
 import cors from "cors";
+import "dotenv/config";
 
 import authRoutes from "./routes/auth";
-import "dotenv/config";
 
 const app = express();
 
