@@ -7,7 +7,11 @@ initConnection(function () {
 
   app.listen(port, () => {
     console.log(`[server]: Server running on port ${port}`);
-  })
+  });
+
+  app.get("/", (req, res) => {
+    res.send("server is running!");
+  });
 });
 
 export default app;

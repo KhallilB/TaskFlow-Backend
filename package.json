@@ -7,7 +7,8 @@
     "test": "npx jest --coverage --detectOpenHandles",
     "build": "npx tsc",
     "start": "npx tsc && node ./dist/index.js",
-    "dev": "nodemon src/index.ts"
+    "dev": "nodemon src/index.ts",
+    "create-env": "printenv > .env"
   },
   "repository": {
     "type": "git",
