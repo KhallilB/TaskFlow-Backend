@@ -32,19 +32,29 @@ steps:
       [
         "build",
         "--cache-from",
-        "$_TASK_FLOW_IMAGE",
+        "$_TASK_FLOW_IMAGE:latest",
         "-f",
         "Dockerfile",
         "--target",
         "prod",
         "-t",
-        "$_TASK_FLOW_IMAGE",
+        "$_TASK_FLOW_IMAGE:latest",
         ".",
       ]
 
   # Push the Docker image to Artifact Registry
   - name: "gcr.io/cloud-builders/docker"
-    args: ["push", "$_TASK_FLOW_IMAGE"]
+    args: ["push", "$_TASK_FLOW_IMAGE:latest"]
+
+  # Delete old images from Artifact Registry
+  - name: us-docker.pkg.dev/gcr-cleaner/gcr-cleaner/gcr-cleaner-cli:latest
+    args:
+      - -repo
+      - "$_TASK_FLOW_IMAGE"
+      - -keep
+      - "2"
+      - -tag-filter-any
+      - ".*"
 
   # Deploy container image to Cloud Run
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
@@ -55,7 +65,7 @@ steps:
         "deploy",
         "backend-image",
         "--image",
-        "$_TASK_FLOW_IMAGE",
+        "$_TASK_FLOW_IMAGE:latest",
         "--region",
         "us-west3",
       ]
@@ -64,7 +74,7 @@ options:
   logging: CLOUD_LOGGING_ONLY
 
 substitutions:
-  _TASK_FLOW_IMAGE: "us-west1-docker.pkg.dev/task-flow-backend-services/task-flow-backend-repo/backend-image:latest"
+  _TASK_FLOW_IMAGE: "us-west1-docker.pkg.dev/task-flow-backend-services/task-flow-backend-repo/backend-image"
 
 images:
   # Define the Docker image to be pushed to Artifact Registry
