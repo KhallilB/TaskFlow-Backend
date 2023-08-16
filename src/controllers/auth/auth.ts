@@ -59,13 +59,17 @@ export const login = async (
   try {
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid credentials" });
     }
 
     // Check if password matches
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid credentials" });
     }
 
     // Create token
@@ -74,6 +78,25 @@ export const login = async (
     res.status(200).json({
       success: true,
       token,
+      data: user,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+// @desc Get current logged in user
+// @route GET /api/v1/auth/profile
+// @access Private
+export const getProfile = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const user = await User.findById((<any>req).user?.id);
+    res.status(200).json({
+      success: true,
       data: user,
     });
   } catch (error: any) {
