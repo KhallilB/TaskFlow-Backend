@@ -127,3 +127,24 @@ export const updateProfile = async (
     next(error);
   }
 };
+
+
+// @desc Delete user profile
+// @route DELETE /api/v1/auth/profile
+// @access Private
+export const deleteProfile = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    await User.findByIdAndDelete((<any>req).user?.id);
+
+    res.status(200).json({
+      success: true,
+      data: {},
+    });
+  } catch(error: any) {
+    next(error);
+  }
+}
