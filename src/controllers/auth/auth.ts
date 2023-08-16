@@ -95,6 +95,30 @@ export const getProfile = async (
 ) => {
   try {
     const user = await User.findById((<any>req).user?.id);
+
+    res.status(200).json({
+      success: true,
+      data: user,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+// @desc Update user profile
+// @route PUT /api/v1/auth/profile
+// @access Private
+export const updateProfile = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const user = await User.findByIdAndUpdate((<any>req).user?.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+
     res.status(200).json({
       success: true,
       data: user,

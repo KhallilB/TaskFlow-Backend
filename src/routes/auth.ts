@@ -12,5 +12,6 @@ router.post("/login", login);
 
 // Private Routes
 router.get("/profile", isUserAuthorized, getProfile);
+router.put("/profile", isUserAuthorized, getProfile);
 
 export default router;
