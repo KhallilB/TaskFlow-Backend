@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import User from "../../models/User";
+import User, { IUserDocument } from "../../models/User";
+import { UpdateFieldProps } from "./types";
 
 // @desc    Register a new user
 // @route   POST /api/v1/auth/register
@@ -114,20 +115,40 @@ export const updateProfile = async (
   next: NextFunction
 ) => {
   try {
-    const user = await User.findByIdAndUpdate((<any>req).user?.id, req.body, {
-      new: true,
-      runValidators: true,
+    let fields: UpdateFieldProps = {
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      email: req.body.email,
+      notificationPreferences: req.body.notificationPreferences,
+      timezone: req.body.timezone,
+    };
+
+    // Exit if request body fields are not in fields object return error
+    Object.keys(req.body).forEach((key) => {
+      if(!fields[key]) {
+        return res.status(400).json({
+          success: false,
+          message: `Invalid field ${key}`
+        })
+      }
     });
 
-    res.status(200).json({
-      success: true,
-      data: user,
-    });
+    const user = (await User.findByIdAndUpdate((<any>req).user?.id, fields, {
+      new: true,
+      runValidators: true,
+    })) as IUserDocument;
+
+    if (user)  {
+      res.status(200).json({
+        success: true,
+        data: fields,
+      });
+    }
+
   } catch (error: any) {
     next(error);
   }
 };
-
 
 // @desc Delete user profile
 // @route DELETE /api/v1/auth/profile
@@ -144,7 +165,7 @@ export const deleteProfile = async (
       success: true,
       data: {},
     });
-  } catch(error: any) {
+  } catch (error: any) {
     next(error);
   }
-}
+};

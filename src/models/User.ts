@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 export interface IUserDocument extends Document {
+  [key: string]: any; // Add index signature
   username: string;
   firstName: string;
   lastName: string;
