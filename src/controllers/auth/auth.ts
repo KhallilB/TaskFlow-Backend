@@ -131,39 +131,6 @@ export const updateProfile = async (
           message: `Invalid field ${key}`,
         });
       }
-
-      if (key === "notificationPreferences") {
-        fields[key] = JSON.parse(fields[key]);
-      }
-
-      // Sanaitize fields
-      fields[key] = req.body[key].trim().replace(/ /g, "");
-
-      // Uppercase first letter of first and last name
-      if (key === "firstName" || key === "lastName")
-        fields[key] = req.body[key].str.charAt(0).toUpperCase();
-
-      // match email regex
-      if (key === "email") {
-        const emailRegex = /\S+@\S+\.\S+/;
-        if (!emailRegex.test(fields[key])) {
-          return res.status(400).json({
-            success: false,
-            message: `Invalid email`,
-          });
-        }
-      }
-
-      // match timezone regex
-      if (key === "timezone") {
-        const timezoneRegex = /^([+-]?)([\d]{2}):?([\d]{2})$/;
-        if (!timezoneRegex.test(fields[key])) {
-          return res.status(400).json({
-            success: false,
-            message: `Invalid timezone`,
-          });
-        }
-      }
     });
 
     const user = (await User.findByIdAndUpdate((<any>req).user?.id, fields, {
