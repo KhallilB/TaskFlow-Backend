@@ -7,6 +7,7 @@ import cors from "cors";
 import "dotenv/config";
 
 import authRoutes from "./routes/auth";
+import projectRouter from "./routes/projects";
 
 const app = express();
 
@@ -21,6 +22,6 @@ app.use(
   })
 );
 
-app.use("/api/v1", [authRoutes]);
+app.use("/api/v1", [authRoutes, projectRouter]);
 
 export default app;
