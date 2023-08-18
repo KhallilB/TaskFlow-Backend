@@ -58,8 +58,8 @@ const userSchema = new Schema<IUser, IUserModel>(
       // One special character
       // One digit
       // Min Length of 8
-      match: /^(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9]){8}$/,
-      minlength: 8
+      match: /^(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*[0-9]).{8,}$/,
+      minlength: 8,
     },
     notificationPreferences: {
       email: {

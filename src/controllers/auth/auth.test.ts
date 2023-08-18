@@ -9,7 +9,7 @@ const userData = {
   firstName: "John",
   lastName: "Doe",
   email: "test@example.com",
-  password: "testpassword",
+  password: "Testpassword2@",
 };
 
 describe("User Model", () => {
@@ -33,7 +33,8 @@ describe("User Model", () => {
 
   it("should hash password", async () => {
     const user = new User(userData);
-    await user.save();
+    let savedUser = await user.save();
+    console.log(savedUser);
 
     expect(user.password).not.toBe(userData.password);
   });
