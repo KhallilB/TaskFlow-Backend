@@ -152,6 +152,18 @@ describe("Profile v1", () => {
     expect(response.body.data).toBeDefined();
   });
 
+  it("should update profile", async () => {
+    const response = await request(app)
+      .put("/api/v1/auth/profile")
+      .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`)
+      .send({ firstName: "Jane" });
+
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.data).toBeDefined();
+    expect(response.body.data.firstName).toBe("Jane");
+  });
+
   afterAll(async () => {
     await User.deleteOne({ email: userData.email })
     await mongoose.connection.close();
