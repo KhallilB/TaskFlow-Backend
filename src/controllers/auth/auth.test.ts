@@ -151,6 +151,18 @@ describe("Profile v1", () => {
     expect(response.body.data).toBeDefined();
   });
 
+  it("get profile should return 404 if user is not found", async () => {
+    jest.spyOn(User, "findById").mockResolvedValueOnce(null);
+
+    const response = await request(app)
+      .get("/api/v1/auth/profile")
+      .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`);
+      
+    expect(response.status).toBe(404);
+    expect(response.body.success).toBe(false);
+    expect(response.body.message).toBe("User not found");
+  });
+
   it("get profile should return error", async () => {
     jest.spyOn(User, "findById").mockRejectedValue(new Error("Mocked error"));
 
