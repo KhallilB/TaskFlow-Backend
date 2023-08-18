@@ -18,7 +18,7 @@ const isUserAuthorized = async (req: Request, res: Response, next: NextFunction)
       token,
       process.env.JWT_SECRET as string
     );
-    
+
     // Attach the decoded token to the request object
     (<any>req).user = decoded;
 

@@ -1,7 +1,6 @@
 import request from "supertest";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
-import { afterThis } from "jest-after-this";
 import app from "../../app";
 import User from "../../models/User";
 
