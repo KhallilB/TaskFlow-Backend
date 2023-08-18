@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import app from "../../app";
 import User from "../../models/User";
+import jwt from "jsonwebtoken";
 
 const userData = {
   username: "testuser",
