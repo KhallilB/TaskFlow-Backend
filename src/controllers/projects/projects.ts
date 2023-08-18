@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import Project from "../../models/Project";
+import Project from "../../models/Project/Project";
 
 export const createProject = async (
     req: Request,

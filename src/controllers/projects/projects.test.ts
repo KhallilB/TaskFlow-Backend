@@ -1,7 +1,7 @@
 import request from "supertest";
 import mongoose from "mongoose";
 import app from "../../app";
-import Project from "../../models/Project";
+import Project from "../../models/Project/Project";
 
 const userData = {
   username: "testuser",
