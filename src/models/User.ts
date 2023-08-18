@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 export interface IUserDocument extends Document {
+  [key: string]: any; // Add index signature
   username: string;
   firstName: string;
   lastName: string;
@@ -53,12 +54,13 @@ const userSchema = new Schema<IUser, IUserModel>(
     password: {
       type: String,
       required: true,
+      // One uppercase letter
+      // One special character
+      // One digit
+      // Min Length of 8
+      match: /^(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*[0-9]).{8,}$/,
+      minlength: 8,
     },
-    // role: {
-    //   type: String,
-    //   enum: ["admin", "leader", "member"], // Customize roles as needed
-    //   default: "member", // Set a default role
-    // },
     notificationPreferences: {
       email: {
         type: Boolean,
@@ -101,8 +103,10 @@ const userSchema = new Schema<IUser, IUserModel>(
 // Hash password before saving
 userSchema.pre("save", async function (next) {
   // if (!this.isModified("password")) return next();
-
   try {
+    this.firstName = this.firstName.charAt(0).toUpperCase();
+    this.lastName = this.lastName.charAt(0).toUpperCase();
+
     const hashedPassword = await bcrypt.hash(this.password, 10);
     this.password = hashedPassword;
     next();

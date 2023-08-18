@@ -1,16 +1,19 @@
+import { Request, Response, NextFunction } from "express";
 import request from "supertest";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
-import { afterThis } from "jest-after-this";
 import app from "../../app";
 import User from "../../models/User";
+
+import isUserAuthorized from "../../middleware/isUserAuthorized/isUserAuthorized";
+import { getProfile } from "./auth";
 
 const userData = {
   username: "testuser",
   firstName: "John",
   lastName: "Doe",
   email: "test@example.com",
-  password: "testpassword",
+  password: "Testpassword2@",
 };
 
 describe("User Model", () => {
@@ -35,7 +38,6 @@ describe("User Model", () => {
   it("should hash password", async () => {
     const user = new User(userData);
     await user.save();
-
     expect(user.password).not.toBe(userData.password);
   });
 });
@@ -124,6 +126,100 @@ describe("Login v1", () => {
     expect(response.status).toBe(500);
   });
 
+  afterAll(async () => {
+    await mongoose.connection.close();
+  });
+});
+
+//------------------------------------------------------------
+
+describe("Profile v1", () => {
+  beforeAll(async () => {
+    jest.resetAllMocks();
+    await mongoose.connect(process.env.MONGO_URI!);
+    const response = await request(app)
+      .post("/api/v1/auth/login")
+      .send({ email: userData.email, password: userData.password });
+
+    process.env.TEST_TOKEN = response.body.token;
+  });
+
+  it("should get profile", async () => {
+    const response = await request(app)
+      .get("/api/v1/auth/profile")
+      .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.data).toBeDefined();
+  });
+
+  it("get profile should return 404 if user is not found", async () => {
+    jest.spyOn(User, "findById").mockResolvedValueOnce(null);
+
+    const response = await request(app)
+      .get("/api/v1/auth/profile")
+      .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`);
+
+    expect(response.status).toBe(404);
+    expect(response.body.success).toBe(false);
+    expect(response.body.message).toBe("User not found");
+  });
+
+  it("get profile should return error", async () => {
+    jest.spyOn(User, "findById").mockRejectedValue(new Error("Mocked error"));
+
+    const response = await request(app)
+      .get("/api/v1/auth/profile")
+      .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`);
+
+    expect(response.status).toBe(500);
+  });
+
+  it("should update profile", async () => {
+    const response = await request(app)
+      .put("/api/v1/auth/profile")
+      .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`)
+      .send({ firstName: "Jane" });
+
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.data).toBeDefined();
+    expect(response.body.data.firstName).toBe("Jane");
+  });
+
+  it("update profile should only contain allowed fields", async () => {
+    const response = await request(app)
+      .put("/api/v1/auth/profile")
+      .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`)
+      .send({ firstName: "Jane", password: "Testpassword2@" });
+
+    expect(response.status).toBe(400);
+    expect(response.body.success).toBe(false);
+    expect(response.body.message).toBe("Invalid field password");
+  });
+
+  it("should delete profile", async () => {
+    const response = await request(app)
+      .delete("/api/v1/auth/profile")
+      .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.data).toBeDefined();
+  });
+
+  it("delete profile should return error", async () => {
+    jest
+      .spyOn(User, "findByIdAndDelete")
+      .mockRejectedValue(new Error("Mocked error"));
+
+    const response = await request(app)
+      .delete("/api/v1/auth/profile")
+      .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`);
+
+    expect(response.status).toBe(500);
+  });
 
   afterAll(async () => {
     await User.deleteOne({ email: userData.email });

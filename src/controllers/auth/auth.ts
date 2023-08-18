@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import User from "../../models/User";
+import User, { IUserDocument } from "../../models/User";
+import { UpdateFieldProps } from "./types";
 
 // @desc    Register a new user
 // @route   POST /api/v1/auth/register
@@ -59,13 +60,17 @@ export const login = async (
   try {
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid credentials" });
     }
 
     // Check if password matches
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid credentials" });
     }
 
     // Create token
@@ -75,6 +80,96 @@ export const login = async (
       success: true,
       token,
       data: user,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+// @desc Get current logged in user
+// @route GET /api/v1/auth/profile
+// @access Private
+export const getProfile = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const user = await User.findById((<any>req).user?.id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: user,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+// @desc Update user profile
+// @route PUT /api/v1/auth/profile
+// @access Private
+export const updateProfile = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    let fields: UpdateFieldProps = {
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      email: req.body.email,
+      notificationPreferences: req.body.notificationPreferences,
+      timezone: req.body.timezone,
+    };
+
+    // Exit if request body fields are not in fields object return error
+    Object.keys(req.body).forEach((key) => {
+      if (!fields[key]) {
+        return res.status(400).json({
+          success: false,
+          message: `Invalid field ${key}`,
+        });
+      }
+    });
+
+    const user = (await User.findByIdAndUpdate((<any>req).user?.id, fields, {
+      new: true,
+      runValidators: true,
+    })) as IUserDocument;
+
+    if (user) {
+      res.status(200).json({
+        success: true,
+        data: fields,
+      });
+    }
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+// @desc Delete user profile
+// @route DELETE /api/v1/auth/profile
+// @access Private
+export const deleteProfile = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    await User.findByIdAndDelete((<any>req).user?.id);
+
+    res.status(200).json({
+      success: true,
+      data: {},
     });
   } catch (error: any) {
     next(error);
