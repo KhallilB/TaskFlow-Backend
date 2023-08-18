@@ -5,6 +5,7 @@ import bcrypt from "bcrypt";
 import app from "../../app";
 import User from "../../models/User";
 
+import isUserAuthorized from "../../middleware/isUserAuthorized/isUserAuthorized";
 import { getProfile } from "./auth";
 
 const userData = {
@@ -133,22 +134,6 @@ describe("Login v1", () => {
 //------------------------------------------------------------
 
 describe("Profile v1", () => {
-  const mockRequest = (headers: any = {}, query: any = {}) =>
-    ({
-      headers,
-      query,
-    } as Request);
-
-  const mockResponse = () => {
-    const res: Partial<Response> = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn(),
-    };
-    return res as Response;
-  };
-
-  const mockNext = jest.fn() as NextFunction;
-
   beforeAll(async () => {
     jest.resetAllMocks();
     await mongoose.connect(process.env.MONGO_URI!);
