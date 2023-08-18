@@ -1,9 +1,11 @@
+import { Request, Response, NextFunction } from "express";
 import request from "supertest";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import app from "../../app";
 import User from "../../models/User";
-import jwt from "jsonwebtoken";
+
+import { getProfile } from "./auth";
 
 const userData = {
   username: "testuser",
@@ -131,6 +133,22 @@ describe("Login v1", () => {
 //------------------------------------------------------------
 
 describe("Profile v1", () => {
+  const mockRequest = (headers: any = {}, query: any = {}) =>
+    ({
+      headers,
+      query,
+    } as Request);
+
+  const mockResponse = () => {
+    const res: Partial<Response> = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+    return res as Response;
+  };
+
+  const mockNext = jest.fn() as NextFunction;
+
   beforeAll(async () => {
     jest.resetAllMocks();
     await mongoose.connect(process.env.MONGO_URI!);
@@ -157,7 +175,7 @@ describe("Profile v1", () => {
     const response = await request(app)
       .get("/api/v1/auth/profile")
       .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`);
-      
+
     expect(response.status).toBe(404);
     expect(response.body.success).toBe(false);
     expect(response.body.message).toBe("User not found");
