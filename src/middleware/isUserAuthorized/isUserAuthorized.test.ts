@@ -4,7 +4,7 @@ import isUserAuthorized from "./isUserAuthorized"; // Adjust the import path acc
 
 const mockRequest = (sessionData = {}) => sessionData as Partial<Request>;
 
-const mockResponse = (req: Partial<Request>) => {
+const mockResponse = () => {
   const res: Partial<Response> = {};
   res.status = jest.fn().mockReturnValue(res);
   res.json = jest.fn().mockReturnValue(res);
@@ -47,5 +47,17 @@ describe("isUserAuthorized Middleware", () => {
     expect(next).toHaveBeenCalled();
     expect(res.status).not.toHaveBeenCalled();
     expect(res.json).not.toHaveBeenCalled();
+  });
+
+
+  it("should return 401 if no token is provided", async () => {
+    await isUserAuthorized(req as Request, res as Response, next);
+
+    expect(jwt.verify).not.toHaveBeenCalled();
+    expect(next).not.toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(401);
+    expect(res.json).toHaveBeenCalledWith({
+      message: "No token provided",
+    });
   });
 });
