@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import User, { IUserDocument } from "../../models/User";
+import User, { IUserDocument } from "../../models/User/User";
 import { UpdateFieldProps } from "./types";
 
 // @desc    Register a new user
