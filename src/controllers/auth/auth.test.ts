@@ -1,16 +1,9 @@
 import request from "supertest";
 import mongoose from "mongoose";
-import bcrypt from "bcrypt";
 import app from "../../app";
 import User from "../../models/User/User";
 
-const userData = {
-  username: "testuser",
-  firstName: "John",
-  lastName: "Doe",
-  email: "test@example.com",
-  password: "Testpassword2@",
-};
+import { mockUserData } from "../../test/mock";
 
 describe("Registration v1", () => {
   beforeAll(async () => {
@@ -20,7 +13,7 @@ describe("Registration v1", () => {
   it("should register a new user", async () => {
     const response = await request(app)
       .post("/api/v1/auth/register")
-      .send(userData);
+      .send(mockUserData);
 
     expect(response.status).toBe(201);
     expect(response.body.success).toBe(true);
@@ -31,7 +24,7 @@ describe("Registration v1", () => {
   it("should not register a user with an existing username", async () => {
     const response = await request(app)
       .post("/api/v1/auth/register")
-      .send(userData);
+      .send(mockUserData);
 
     expect(response.status).toBe(400);
     expect(response.body.success).toBe(false);
@@ -59,7 +52,7 @@ describe("Login v1", () => {
   it("should login a user", async () => {
     const response = await request(app)
       .post("/api/v1/auth/login")
-      .send({ email: userData.email, password: userData.password });
+      .send({ email: mockUserData.email, password: mockUserData.password });
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBe(true);
@@ -70,7 +63,7 @@ describe("Login v1", () => {
   it("should not login a user with incorrect email", async () => {
     const response = await request(app)
       .post("/api/v1/auth/login")
-      .send({ email: "1" + userData.email, password: userData.password });
+      .send({ email: "1" + mockUserData.email, password: mockUserData.password });
 
     expect(response.status).toBe(401);
     expect(response.body.message).toBe("Invalid credentials");
@@ -79,7 +72,7 @@ describe("Login v1", () => {
   it("should not login a user with incorrect password", async () => {
     const response = await request(app)
       .post("/api/v1/auth/login")
-      .send({ email: userData.email, password: "1" + userData.password });
+      .send({ email: mockUserData.email, password: "1" + mockUserData.password });
 
     expect(response.status).toBe(401);
     expect(response.body.message).toBe("Invalid credentials");
@@ -107,7 +100,7 @@ describe("Profile v1", () => {
     await mongoose.connect(process.env.MONGO_URI!);
     const response = await request(app)
       .post("/api/v1/auth/login")
-      .send({ email: userData.email, password: userData.password });
+      .send({ email: mockUserData.email, password: mockUserData.password });
 
     process.env.TEST_TOKEN = response.body.token;
   });
@@ -190,7 +183,7 @@ describe("Profile v1", () => {
   });
 
   afterAll(async () => {
-    await User.deleteOne({ email: userData.email });
+    await User.deleteOne({ email: mockUserData.email });
     await mongoose.connection.close();
   });
 });
