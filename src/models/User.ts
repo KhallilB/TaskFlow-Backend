@@ -104,8 +104,8 @@ const userSchema = new Schema<IUser, IUserModel>(
 userSchema.pre("save", async function (next) {
   // if (!this.isModified("password")) return next();
   try {
-    this.firstName = this.firstName.charAt(0).toUpperCase();
-    this.lastName = this.lastName.charAt(0).toUpperCase();
+    this.firstName = this.firstName.charAt(0).toUpperCase() + this.firstName.slice(1);
+    this.lastName = this.lastName.charAt(0).toUpperCase() + this.lastName.slice(1);
 
     const hashedPassword = await bcrypt.hash(this.password, 10);
     this.password = hashedPassword;
