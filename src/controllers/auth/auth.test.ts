@@ -1,12 +1,8 @@
-import { Request, Response, NextFunction } from "express";
 import request from "supertest";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import app from "../../app";
 import User from "../../models/User";
-
-import isUserAuthorized from "../../middleware/isUserAuthorized/isUserAuthorized";
-import { getProfile } from "./auth";
 
 const userData = {
   username: "testuser",
