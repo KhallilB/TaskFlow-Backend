@@ -78,6 +78,7 @@ describe("isUserAuthorized Middleware", () => {
     expect(res.status).toHaveBeenCalledWith(403);
     expect(res.json).toHaveBeenCalledWith({
       message: "Authorization failed.",
+      error: expect.anything(),
     });
   });
 });

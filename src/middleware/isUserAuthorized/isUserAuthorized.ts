@@ -25,9 +25,8 @@ const isUserAuthorized = async (req: Request, res: Response, next: NextFunction)
     // Proceed to the next middleware
     next();
   } catch (error) {
-    console.log("Error in authorization middleware", error);
-    console.error.bind(console, error);
-    return res.status(403).json({ message: "Authorization failed." });
+    console.error.bind(console, `Error in authorization middleware: ${error}`);
+    return res.status(403).json({ message: "Authorization failed.", error });
   }
 };
 
