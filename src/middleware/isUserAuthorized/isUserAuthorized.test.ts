@@ -46,7 +46,7 @@ describe("isUserAuthorized Middleware", () => {
   });
 
   it("should return 401 if no token is provided", async () => {
-    const req = mockRequest(); // No headers
+    const req = mockRequest();
     const res = mockResponse();
 
     await isUserAuthorized(req, res, mockNext);
