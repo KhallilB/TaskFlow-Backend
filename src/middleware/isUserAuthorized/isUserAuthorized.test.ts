@@ -1,63 +1,83 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import isUserAuthorized from "./isUserAuthorized"; // Adjust the import path accordingly
-
-const mockRequest = (sessionData = {}) => sessionData as Partial<Request>;
-
-const mockResponse = () => {
-  const res: Partial<Response> = {};
-  res.status = jest.fn().mockReturnValue(res);
-  res.json = jest.fn().mockReturnValue(res);
-  return res as Response;
-};
+import isUserAuthorized from "./isUserAuthorized";
 
 describe("isUserAuthorized Middleware", () => {
+  const mockRequest = (headers: any = {}, query: any = {}) =>
+    ({
+      headers,
+      query,
+    } as Request);
+
+  const mockResponse = () => {
+    const res: Partial<Response> = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+    return res as Response;
+  };
+
+  const mockNext = jest.fn() as NextFunction;
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it("should pass authorization and call next if token is valid", async () => {
-    // Generate mock token
-    process.env.JWT_SECRET = "test-secret-key";
-    const tokenData = { _id: "123456", "iat": Date.now() };
-    const signedToken = jwt.sign(tokenData, "test-secret-key");
     jest.spyOn(jwt, "verify");
-
-    // Mock request and response
-    const req: Partial<Request> = mockRequest({
-      headers: {
-        authorization: `Bearer ${signedToken}`,
-      },
-    });
-
-    const res: Partial<Response> = mockResponse(req);
-
-    // Mock next function
-    const next = jest.fn();
-
-    // Call the middleware
-    await isUserAuthorized(req as Request, res as Response, next);
-
-    if ((req as any).user) {
-      next();
-    }
-
-    // Assertions
-    expect(jwt.verify).toHaveBeenCalledWith(
-      signedToken,
+    process.env.JWT_SECRET = "test_secret";
+    const validToken = jwt.sign(
+      { id: "123456", iat: Date.now() },
       process.env.JWT_SECRET
     );
-    expect((req as any).user).toEqual(tokenData);
-    expect(next).toHaveBeenCalled();
+
+    const req = mockRequest({
+      authorization: `Bearer ${validToken}`,
+    });
+    const res = mockResponse();
+
+    await isUserAuthorized(req, res, mockNext);
+
+    expect(jwt.verify).toHaveBeenCalledWith(validToken, process.env.JWT_SECRET);
+    expect((req as any).user).toHaveProperty("id", "123456");
+    expect(mockNext).toHaveBeenCalled();
     expect(res.status).not.toHaveBeenCalled();
     expect(res.json).not.toHaveBeenCalled();
   });
 
-
   it("should return 401 if no token is provided", async () => {
-    await isUserAuthorized(req as Request, res as Response, next);
+    const req = mockRequest(); // No headers
+    const res = mockResponse();
+
+    await isUserAuthorized(req, res, mockNext);
 
     expect(jwt.verify).not.toHaveBeenCalled();
-    expect(next).not.toHaveBeenCalled();
+    expect(mockNext).not.toHaveBeenCalled();
     expect(res.status).toHaveBeenCalledWith(401);
     expect(res.json).toHaveBeenCalledWith({
       message: "No token provided",
+    });
+  });
+
+  it("should return 403 if token verification fails", async () => {
+    jest.spyOn(jwt, "verify");
+    const invalidToken = "invalid_token";
+
+    const req = mockRequest({
+      authorization: `Bearer ${invalidToken}`,
+    });
+    const res = mockResponse();
+
+    await isUserAuthorized(req, res, mockNext);
+
+    expect(jwt.verify).toHaveBeenCalledWith(
+      invalidToken,
+      process.env.JWT_SECRET
+    );
+    expect(mockNext).not.toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(res.json).toHaveBeenCalledWith({
+      message: "Authorization failed.",
     });
   });
 });
