@@ -174,6 +174,19 @@ describe("Profile v1", () => {
     expect(response.body.data.firstName).toBe("Jane");
   });
 
+  it("update profile should only contain allowed fields", async () => {
+    const response = await request(app)
+      .put("/api/v1/auth/profile")
+      .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`)
+      .send({ firstName: "Jane", password: "Testpassword2@" });
+
+      
+      expect(response.status).toBe(400)
+      expect(response.body.success).toBe(false)
+      expect(response.body.message).toBe("Invalid field password")
+  });
+
+
   it("should delete profile", async () => {
     const response = await request(app)
       .delete("/api/v1/auth/profile")
