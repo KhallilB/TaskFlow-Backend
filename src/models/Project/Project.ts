@@ -21,7 +21,7 @@ const projectSchema = new Schema<IProject, IProjectModel>(
   {
     name: {
       type: String,
-      required: true,
+      unique: false
     },
     description: String,
     status: {
