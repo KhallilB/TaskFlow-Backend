@@ -89,7 +89,7 @@ describe("Login v1", () => {
     const response = await request(app)
       .post("/api/v1/auth/login")
       .send({ email: userData.email, password: userData.password });
-  
+
     expect(response.status).toBe(200);
     expect(response.body.success).toBe(true);
     expect(response.body.token).toBeDefined();
@@ -123,7 +123,6 @@ describe("Login v1", () => {
     expect(response.status).toBe(500);
   });
 
-
   afterAll(async () => {
     await mongoose.connection.close();
   });
@@ -138,8 +137,8 @@ describe("Profile v1", () => {
     const response = await request(app)
       .post("/api/v1/auth/login")
       .send({ email: userData.email, password: userData.password });
-          
-      process.env.TEST_TOKEN = response.body.token;
+
+    process.env.TEST_TOKEN = response.body.token;
   });
 
   it("should get profile", async () => {
@@ -180,12 +179,10 @@ describe("Profile v1", () => {
       .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`)
       .send({ firstName: "Jane", password: "Testpassword2@" });
 
-      
-      expect(response.status).toBe(400)
-      expect(response.body.success).toBe(false)
-      expect(response.body.message).toBe("Invalid field password")
+    expect(response.status).toBe(400);
+    expect(response.body.success).toBe(false);
+    expect(response.body.message).toBe("Invalid field password");
   });
-
 
   it("should delete profile", async () => {
     const response = await request(app)
@@ -197,8 +194,20 @@ describe("Profile v1", () => {
     expect(response.body.data).toBeDefined();
   });
 
+  it("delete profile should return error", async () => {
+    jest
+      .spyOn(User, "findByIdAndDelete")
+      .mockRejectedValue(new Error("Mocked error"));
+
+    const response = await request(app)
+      .delete("/api/v1/auth/profile")
+      .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`);
+
+    expect(response.status).toBe(500);
+  });
+
   afterAll(async () => {
-    await User.deleteOne({ email: userData.email })
+    await User.deleteOne({ email: userData.email });
     await mongoose.connection.close();
   });
 });
