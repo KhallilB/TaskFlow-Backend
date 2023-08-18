@@ -152,6 +152,16 @@ describe("Profile v1", () => {
     expect(response.body.data).toBeDefined();
   });
 
+  it("get profile should return error", async () => {
+    jest.spyOn(User, "findById").mockRejectedValue(new Error("Mocked error"));
+
+    const response = await request(app)
+      .get("/api/v1/auth/profile")
+      .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`);
+
+    expect(response.status).toBe(500);
+  });
+
   it("should update profile", async () => {
     const response = await request(app)
       .put("/api/v1/auth/profile")
