@@ -164,6 +164,16 @@ describe("Profile v1", () => {
     expect(response.body.data.firstName).toBe("Jane");
   });
 
+  it("should delete profile", async () => {
+    const response = await request(app)
+      .delete("/api/v1/auth/profile")
+      .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.data).toBeDefined();
+  });
+
   afterAll(async () => {
     await User.deleteOne({ email: userData.email })
     await mongoose.connection.close();
