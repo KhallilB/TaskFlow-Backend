@@ -10,11 +10,11 @@ router.use("/projects", router);
 // Project CRUD
 router.post("/create", isUserAuthorized, createProject);
 router.get("/", isUserAuthorized, getProjects);
-router.get("/:id", isUserAuthorized, getProject);
-router.put("/:id", isUserAuthorized, updateProject);
-router.delete("/:id", isUserAuthorized, deleteProject);
+router.get("/:projectId", isUserAuthorized, getProject);
+router.put("/:projectId", isUserAuthorized, updateProject);
+router.delete("/:projectId", isUserAuthorized, deleteProject);
 
 // Project Assignment
-router.post("/:projectId/assign/user/:userId", isUserAuthorized, createProject);
+router.post("/:projectId/assign/user", isUserAuthorized, createProject);
 
 export default router;

@@ -48,7 +48,7 @@ export const getProject = async (
   next: NextFunction
 ) => {
   try {
-    const project = await Project.findById(req.params.id);
+    const project = await Project.findById(req.params.projectId);
 
     return res.status(200).json({
       success: true,
@@ -68,7 +68,7 @@ export const updateProject = async (
     const { name, description } = req.body;
 
     const project = await Project.findByIdAndUpdate(
-      req.params.id,
+      req.params.projectId,
       {
         name,
         description,
@@ -91,7 +91,7 @@ export const deleteProject = async (
   next: NextFunction
 ) => {
   try {
-    await Project.findByIdAndDelete(req.params.id);
+    await Project.findByIdAndDelete(req.params.projectId);
 
     return res.status(200).json({
       success: true,
@@ -110,8 +110,11 @@ export const assignUserToProject = async (
   try {
     const { userId } = req.body;
 
+    console.log(req.params.projectId, userId)
+    console.log(req.body)
+
     const project = await Project.findByIdAndUpdate(
-      req.params.id,
+      req.params.projectId,
       {
         $push: { users: userId },
       },

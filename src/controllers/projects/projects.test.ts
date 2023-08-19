@@ -14,9 +14,13 @@ describe("Project Functional Tests", () => {
       .post("/api/v1/auth/register")
       .send(mockUserData);
 
+    const user =  await User.findOne({ username: mockUserData.username });
+
+    process.env.TEST_USER_ID = user?._id;
     process.env.TEST_TOKEN = response.body.token;
   });
 
+  // Create Project -----------------------------------------------------------------------------------------------
   it("should create a new project", async () => {
     const response = await request(app)
       .post("/api/v1/projects/create")
@@ -43,6 +47,7 @@ describe("Project Functional Tests", () => {
     expect(response.status).toBe(500);
   });
 
+  // Get Projects ------------------------------------------------------------------------------------------------
   it("should get all projects", async () => {
     const response = await request(app)
       .get("/api/v1/projects")
@@ -92,6 +97,7 @@ describe("Project Functional Tests", () => {
     expect(response.status).toBe(500);
   });
 
+  // Update Project ----------------------------------------------------------------------------------------------
   it("should update a project", async () => {
     const project = await Project.findOne({ name: mockProjectData.name });
 
@@ -126,14 +132,13 @@ describe("Project Functional Tests", () => {
     expect(response.status).toBe(500);
   });
 
+  // Delete Project ----------------------------------------------------------------------------------------------
   it("should delete a project", async () => {
     const project = await Project.findOne({ name: "Updated Project" });
 
     const response = await request(app)
       .delete(`/api/v1/projects/${project?._id}`)
       .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`);
-
-    console.log(response.body);
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBe(true);
