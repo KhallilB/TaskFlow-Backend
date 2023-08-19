@@ -14,10 +14,11 @@ describe("Project Functional Tests", () => {
       .post("/api/v1/auth/register")
       .send(mockUserData);
 
-    const user =  await User.findOne({ username: mockUserData.username });
+    const user = await User.findOne({ username: mockUserData.username });
 
     process.env.TEST_USER_ID = user?._id;
     process.env.TEST_TOKEN = response.body.token;
+    process.env.TEST_PROJECT_ID;
   });
 
   // Create Project -----------------------------------------------------------------------------------------------
@@ -27,6 +28,7 @@ describe("Project Functional Tests", () => {
       .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`)
       .send(mockProjectData);
 
+    process.env.TEST_PROJECT_ID = response.body.data._id;
     expect(response.status).toBe(201);
     expect(response.body.success).toBe(true);
     expect(response.body.data).toBeDefined();
@@ -72,10 +74,8 @@ describe("Project Functional Tests", () => {
   });
 
   it("should get a project", async () => {
-    const project = await Project.findOne({ name: mockProjectData.name });
-
     const response = await request(app)
-      .get(`/api/v1/projects/${project?._id}`)
+      .get(`/api/v1/projects/${process.env.TEST_PROJECT_ID}`)
       .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`);
 
     expect(response.status).toBe(200);
@@ -97,12 +97,24 @@ describe("Project Functional Tests", () => {
     expect(response.status).toBe(500);
   });
 
+  // Assign User -------------------------------------------------------------------------------------------------
+  it("should assign a user to a project", async () => {
+    const response = await request(app)
+      .post(`/api/v1/projects/${process.env.TEST_PROJECT_ID}/assign/user`)
+      .send({ userId: process.env.TEST_USER_ID })
+      .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`);
+
+    console.log(response.body);
+
+    expect(response.status).toBe(200);
+    expect(response.body.data.users.length).toBeGreaterThan(0);
+    expect(response.body.data.users[0]).toBe(process.env.TEST_USER_ID);
+  });
+
   // Update Project ----------------------------------------------------------------------------------------------
   it("should update a project", async () => {
-    const project = await Project.findOne({ name: mockProjectData.name });
-
     const response = await request(app)
-      .put(`/api/v1/projects/${project?._id}`)
+      .put(`/api/v1/projects/${process.env.TEST_PROJECT_ID}`)
       .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`)
       .send({
         name: "Updated Project",
@@ -134,10 +146,8 @@ describe("Project Functional Tests", () => {
 
   // Delete Project ----------------------------------------------------------------------------------------------
   it("should delete a project", async () => {
-    const project = await Project.findOne({ name: "Updated Project" });
-
     const response = await request(app)
-      .delete(`/api/v1/projects/${project?._id}`)
+      .delete(`/api/v1/projects/${process.env.TEST_PROJECT_ID}`)
       .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`);
 
     expect(response.status).toBe(200);

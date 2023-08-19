@@ -1,6 +1,6 @@
 import { Router } from "express";
 import isUserAuthorized from "../middleware/isUserAuthorized/isUserAuthorized";
-import { createProject, getProjects, getProject, updateProject, deleteProject} from "../controllers/projects/projects";
+import { createProject, getProjects, getProject, updateProject, deleteProject, assignUserToProject} from "../controllers/projects/projects";
 
 const router = Router();
 
@@ -15,6 +15,6 @@ router.put("/:projectId", isUserAuthorized, updateProject);
 router.delete("/:projectId", isUserAuthorized, deleteProject);
 
 // Project Assignment
-router.post("/:projectId/assign/user", isUserAuthorized, createProject);
+router.post("/:projectId/assign/user", isUserAuthorized, assignUserToProject);
 
 export default router;
