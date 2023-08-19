@@ -54,6 +54,18 @@ describe("Project Functional Tests", () => {
     expect(response.body.data.length).toBeGreaterThan(0);
   });
 
+  it("should throw error on getting all projects", async () => {
+    jest.spyOn(Project, "find").mockImplementationOnce(() => {
+      throw new Error("Mocked error");
+    });
+
+    const response = await request(app)
+      .get("/api/v1/projects")
+      .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`);
+
+    expect(response.status).toBe(500);
+  });
+
   afterAll(async () => {
     await User.deleteOne({ username: mockUserData.username });
     await Project.deleteOne({ name: mockProjectData.name });
