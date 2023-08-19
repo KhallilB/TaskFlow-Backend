@@ -1,13 +1,12 @@
 import request from "supertest";
 import mongoose from "mongoose";
 import app from "../../app";
+import User from "../../models/User/User";
 import Project from "../../models/Project/Project";
 
 import { mockUserData, mockProjectData } from "../../test/mock";
 
 describe("Project Functional Tests", () => {
-  let token: string;
-
   beforeAll(async () => {
     await mongoose.connect(process.env.MONGO_URI!);
 
@@ -15,18 +14,13 @@ describe("Project Functional Tests", () => {
       .post("/api/v1/auth/register")
       .send(mockUserData);
 
-    token = response.body.token;
-  });
-
-  afterEach(async () => {
-    jest.clearAllMocks();
+    process.env.TEST_TOKEN = response.body.token;
   });
 
   it("should create a new project", async () => {
-    console.log(token)
     const response = await request(app)
       .post("/api/v1/projects/create")
-      .set("Authorization", `Bearer ${token}`)
+      .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`)
       .send(mockProjectData);
 
     expect(response.status).toBe(201);
@@ -43,14 +37,15 @@ describe("Project Functional Tests", () => {
 
     const response = await request(app)
       .post("/api/v1/projects/create")
-      .set("Authorization", `Bearer ${token}`)
-      .send({});
+      .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`)
+      .send();
 
     expect(response.status).toBe(500);
   });
 
   afterAll(async () => {
+    await User.deleteOne({ username: mockUserData.username });
     await Project.deleteOne({ name: mockProjectData.name });
     await mongoose.connection.close();
-  })
+  });
 });
