@@ -201,7 +201,7 @@ describe("Project Functional Tests", () => {
   });
 
   afterAll(async () => {
-    await User.deleteOne({ username: MOCK_USER_DATA.username });
+    await User.deleteMany({ username: { $in: [MOCK_USER_DATA.username, MOCK_USER_2_DATA.username] } });
     await mongoose.connection.close();
   });
 });
