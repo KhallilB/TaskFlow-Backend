@@ -19,7 +19,7 @@ describe("User Model", () => {
   });
   afterEach(async () => {
     jest.clearAllMocks();
-    User.deleteOne({ username: userData.username });
+    await User.deleteOne({ username: userData.username });
   });
 
   it("should return error on bcrypt hash pre save hook", async () => {

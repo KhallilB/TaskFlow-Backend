@@ -21,9 +21,13 @@ const projectSchema = new Schema<IProject, IProjectModel>(
   {
     name: {
       type: String,
-      unique: false
+      unique: false,
+      required: [true, "Please provide a name for the project"],
     },
-    description: String,
+    description: {
+      type: String,
+      required: [true, "Please provide a description for the project"],
+    },
     status: {
       type: String,
       enum: ["active", "inactive", "archived"],
