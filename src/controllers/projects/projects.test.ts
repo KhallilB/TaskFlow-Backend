@@ -43,6 +43,17 @@ describe("Project Functional Tests", () => {
     expect(response.status).toBe(500);
   });
 
+  it("should get all projects", async () => {
+    const response = await request(app)
+      .get("/api/v1/projects")
+      .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.data).toBeDefined();
+    expect(response.body.data.length).toBeGreaterThan(0);
+  });
+
   afterAll(async () => {
     await User.deleteOne({ username: mockUserData.username });
     await Project.deleteOne({ name: mockProjectData.name });
