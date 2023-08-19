@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import app from "../../app";
 import User from "../../models/User/User";
 
-import { mockUserData } from "../../test/mock";
+import { MOCK_USER_DATA } from "../../test/mock";
 
 describe("Registration v1", () => {
   beforeAll(async () => {
@@ -14,7 +14,7 @@ describe("Registration v1", () => {
   it("should register a new user", async () => {
     const response = await request(app)
       .post("/api/v1/auth/register")
-      .send(mockUserData);
+      .send(MOCK_USER_DATA);
 
     expect(response.status).toBe(201);
     expect(response.body.success).toBe(true);
@@ -25,7 +25,7 @@ describe("Registration v1", () => {
   it("should not register a user with an existing username", async () => {
     const response = await request(app)
       .post("/api/v1/auth/register")
-      .send(mockUserData);
+      .send(MOCK_USER_DATA);
 
     expect(response.status).toBe(400);
     expect(response.body.success).toBe(false);
@@ -53,7 +53,7 @@ describe("Login v1", () => {
   it("should login a user", async () => {
     const response = await request(app)
       .post("/api/v1/auth/login")
-      .send({ email: mockUserData.email, password: mockUserData.password });
+      .send({ email: MOCK_USER_DATA.email, password: MOCK_USER_DATA.password });
 
     expect(response.status).toBe(200);
     expect(response.body.success).toBe(true);
@@ -64,7 +64,7 @@ describe("Login v1", () => {
   it("should not login a user with incorrect email", async () => {
     const response = await request(app)
       .post("/api/v1/auth/login")
-      .send({ email: "1" + mockUserData.email, password: mockUserData.password });
+      .send({ email: "1" + MOCK_USER_DATA.email, password: MOCK_USER_DATA.password });
 
     expect(response.status).toBe(401);
     expect(response.body.message).toBe("Invalid credentials");
@@ -73,7 +73,7 @@ describe("Login v1", () => {
   it("should not login a user with incorrect password", async () => {
     const response = await request(app)
       .post("/api/v1/auth/login")
-      .send({ email: mockUserData.email, password: "1" + mockUserData.password });
+      .send({ email: MOCK_USER_DATA.email, password: "1" + MOCK_USER_DATA.password });
 
     expect(response.status).toBe(401);
     expect(response.body.message).toBe("Invalid credentials");
@@ -101,7 +101,7 @@ describe("Profile v1", () => {
     await mongoose.connect(process.env.MONGO_URI!);
     const response = await request(app)
       .post("/api/v1/auth/login")
-      .send({ email: mockUserData.email, password: mockUserData.password });
+      .send({ email: MOCK_USER_DATA.email, password: MOCK_USER_DATA.password });
 
     process.env.TEST_TOKEN = response.body.token;
   });
@@ -184,7 +184,7 @@ describe("Profile v1", () => {
   });
 
   afterAll(async () => {
-    await User.deleteOne({ email: mockUserData.email });
+    await User.deleteOne({ email: MOCK_USER_DATA.email });
     await mongoose.connection.close();
   });
 });
