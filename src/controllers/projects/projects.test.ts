@@ -110,6 +110,22 @@ describe("Project Functional Tests", () => {
     expect(response.body.data.description).toBe("Updated Project Description");
   });
 
+  it("should throw error on updating a project", async () => {
+    jest.spyOn(Project, "findByIdAndUpdate").mockImplementationOnce(() => {
+      throw new Error("Mocked error");
+    });
+
+    const response = await request(app)
+      .put(`/api/v1/projects/123456`)
+      .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`)
+      .send({
+        name: "Updated Project",
+        description: "Updated Project Description",
+      });
+
+    expect(response.status).toBe(500);
+  });
+
   afterAll(async () => {
     await User.deleteOne({ username: mockUserData.username });
     await Project.deleteOne({ name: mockProjectData.name });
