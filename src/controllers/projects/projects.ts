@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import Project from "../../models/Project/Project";
 
+// Create a new project
 export const createProject = async (
   req: Request,
   res: Response,
@@ -21,10 +22,15 @@ export const createProject = async (
       data: project,
     });
   } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
     next(error);
   }
 };
 
+// Get all user projects
 export const getProjects = async (
   req: Request,
   res: Response,
@@ -38,10 +44,15 @@ export const getProjects = async (
       data: projects,
     });
   } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
     next(error);
   }
 };
 
+// Get one project
 export const getProject = async (
   req: Request,
   res: Response,
@@ -55,10 +66,15 @@ export const getProject = async (
       data: project,
     });
   } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
     next(error);
   }
 };
 
+// Update a project
 export const updateProject = async (
   req: Request,
   res: Response,
@@ -84,10 +100,15 @@ export const updateProject = async (
       data: updatedProject,
     });
   } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
     next(error);
   }
 };
 
+// Delete a project
 export const deleteProject = async (
   req: Request,
   res: Response,
@@ -101,10 +122,16 @@ export const deleteProject = async (
       data: {},
     });
   } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
     next(error);
   }
 };
 
+
+// Assign a user to a project
 export const assignUserToProject = async (
   req: Request,
   res: Response,
@@ -137,6 +164,10 @@ export const assignUserToProject = async (
       data: updatedProject,
     });
   } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
     next(error);
   }
 };
