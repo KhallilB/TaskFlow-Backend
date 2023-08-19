@@ -4,7 +4,11 @@ import app from "../../app";
 import User from "../../models/User/User";
 import Project from "../../models/Project/Project";
 
-import { MOCK_USER_DATA, MOCK_USER_2_DATA, MOCK_PROJECT_DATA } from "../../test/mock";
+import {
+  MOCK_USER_DATA,
+  MOCK_USER_2_DATA,
+  MOCK_PROJECT_DATA,
+} from "../../test/mock";
 
 describe("Project Functional Tests", () => {
   beforeAll(async () => {
@@ -18,6 +22,7 @@ describe("Project Functional Tests", () => {
       .post("/api/v1/auth/register")
       .send(MOCK_USER_2_DATA);
 
+    // TODO: Probably a better way to do this
     const user = await User.findOne({ username: MOCK_USER_DATA.username });
     const user2 = await User.findOne({ username: MOCK_USER_2_DATA.username });
 
@@ -25,6 +30,10 @@ describe("Project Functional Tests", () => {
     process.env.TEST_USER_2_ID = user2?._id;
     process.env.TEST_TOKEN = response.body.token;
     process.env.TEST_PROJECT_ID;
+  });
+
+  afterEach(async () => {
+    jest.clearAllMocks();
   });
 
   // Create Project -----------------------------------------------------------------------------------------------
@@ -113,7 +122,9 @@ describe("Project Functional Tests", () => {
 
     expect(response.status).toBe(200);
     expect(response.body.data.assignedUsers.length).toBeGreaterThan(0);
-    expect(response.body.data.assignedUsers[0]).toBe(process.env.TEST_USER_2_ID);
+    expect(response.body.data.assignedUsers[0]).toBe(
+      process.env.TEST_USER_2_ID
+    );
   });
 
   it("should throw error on assigning a user to a project", async () => {
@@ -151,7 +162,7 @@ describe("Project Functional Tests", () => {
         name: "Updated Project",
         description: "Updated Project Description",
       });
-
+    
     expect(response.status).toBe(200);
     expect(response.body.success).toBe(true);
     expect(response.body.data).toBeDefined();
@@ -201,7 +212,9 @@ describe("Project Functional Tests", () => {
   });
 
   afterAll(async () => {
-    await User.deleteMany({ username: { $in: [MOCK_USER_DATA.username, MOCK_USER_2_DATA.username] } });
+    await User.deleteMany({
+      username: { $in: [MOCK_USER_DATA.username, MOCK_USER_2_DATA.username] },
+    });
     await mongoose.connection.close();
   });
 });
