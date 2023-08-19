@@ -84,3 +84,20 @@ export const updateProject = async (
     next(error);
   }
 };
+
+export const deleteProject = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    await Project.findByIdAndDelete(req.params.id);
+
+    return res.status(200).json({
+      success: true,
+      data: {},
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
