@@ -104,11 +104,22 @@ describe("Project Functional Tests", () => {
       .send({ userId: process.env.TEST_USER_ID })
       .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`);
 
-    console.log(response.body);
-
     expect(response.status).toBe(200);
-    expect(response.body.data.users.length).toBeGreaterThan(0);
-    expect(response.body.data.users[0]).toBe(process.env.TEST_USER_ID);
+    expect(response.body.data.assignedUsers.length).toBeGreaterThan(0);
+    expect(response.body.data.assignedUsers[0]).toBe(process.env.TEST_USER_ID);
+  });
+
+  it("should throw error on assigning a user to a project", async () => {
+    jest.spyOn(Project, "findByIdAndUpdate").mockImplementationOnce(() => {
+      throw new Error("Mocked error");
+    });
+
+    const response = await request(app)
+      .post(`/api/v1/projects/123456/assign/user`)
+      .send({ userId: process.env.TEST_USER_ID })
+      .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`);
+
+    expect(response.status).toBe(500);
   });
 
   // Update Project ----------------------------------------------------------------------------------------------

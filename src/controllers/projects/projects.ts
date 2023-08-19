@@ -116,7 +116,7 @@ export const assignUserToProject = async (
     const project = await Project.findByIdAndUpdate(
       req.params.projectId,
       {
-        $push: { users: userId },
+        $push: { assignedUsers: userId },
       },
       { new: true }
     );
