@@ -2,9 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import User, { IUserDocument } from "../../models/User/User";
 import { UpdateFieldProps } from "./types";
 
-// @desc    Register a new user
-// @route   POST /api/v1/auth/register
-// @access  Public
+// Register a new user
 export const register = async (
   req: Request,
   res: Response,
@@ -43,13 +41,15 @@ export const register = async (
       data: user,
     });
   } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
     next(error);
   }
 };
 
-// @desc    Login user
-// @route   POST /api/v1/auth/login
-// @access  Public
+// Login user
 export const login = async (
   req: Request,
   res: Response,
@@ -82,13 +82,15 @@ export const login = async (
       data: user,
     });
   } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
     next(error);
   }
 };
 
-// @desc Get current logged in user
-// @route GET /api/v1/auth/profile
-// @access Private
+// Get current logged in user
 export const getProfile = async (
   req: Request,
   res: Response,
@@ -109,13 +111,15 @@ export const getProfile = async (
       data: user,
     });
   } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
     next(error);
   }
 };
 
-// @desc Update user profile
-// @route PUT /api/v1/auth/profile
-// @access Private
+// Update user profile
 export const updateProfile = async (
   req: Request,
   res: Response,
@@ -152,13 +156,15 @@ export const updateProfile = async (
       });
     }
   } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    })
     next(error);
   }
 };
 
-// @desc Delete user profile
-// @route DELETE /api/v1/auth/profile
-// @access Private
+// Delete user profile
 export const deleteProfile = async (
   req: Request,
   res: Response,
@@ -172,6 +178,10 @@ export const deleteProfile = async (
       data: {},
     });
   } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
     next(error);
   }
 };
