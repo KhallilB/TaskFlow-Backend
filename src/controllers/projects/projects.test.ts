@@ -113,7 +113,7 @@ describe("Project Functional Tests", () => {
 
     expect(response.status).toBe(200);
     expect(response.body.data.assignedUsers.length).toBeGreaterThan(0);
-    expect(response.body.data.assignedUsers[0]).toBe(process.env.TEST_USER_ID);
+    expect(response.body.data.assignedUsers[0]).toBe(process.env.TEST_USER_2_ID);
   });
 
   it("should throw error on assigning a user to a project", async () => {
@@ -123,7 +123,7 @@ describe("Project Functional Tests", () => {
 
     const response = await request(app)
       .post(`/api/v1/projects/123456/assign/user`)
-      .send({ userId: process.env.TEST_USER_ID })
+      .send({ userId: process.env.TEST_USER_2_ID })
       .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`);
 
     expect(response.status).toBe(500);
