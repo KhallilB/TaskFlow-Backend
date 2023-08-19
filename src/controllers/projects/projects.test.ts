@@ -92,6 +92,24 @@ describe("Project Functional Tests", () => {
     expect(response.status).toBe(500);
   });
 
+  it("should update a project", async () => {
+    const project = await Project.findOne({ name: mockProjectData.name });
+
+    const response = await request(app)
+      .put(`/api/v1/projects/${project?._id}`)
+      .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`)
+      .send({
+        name: "Updated Project",
+        description: "Updated Project Description",
+      });
+
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.data).toBeDefined();
+    expect(response.body.data.name).toBe("Updated Project");
+    expect(response.body.data.description).toBe("Updated Project Description");
+  });
+
   afterAll(async () => {
     await User.deleteOne({ username: mockUserData.username });
     await Project.deleteOne({ name: mockProjectData.name });
