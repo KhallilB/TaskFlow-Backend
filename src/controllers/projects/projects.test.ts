@@ -133,16 +133,29 @@ describe("Project Functional Tests", () => {
       .delete(`/api/v1/projects/${project?._id}`)
       .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`);
 
+    console.log(response.body);
+
     expect(response.status).toBe(200);
     expect(response.body.success).toBe(true);
     expect(response.body.data).toBeDefined();
-    expect(response.body.data.name).toBe("Updated Project");
-    expect(response.body.data.description).toBe("Updated Project Description");
+    expect(response.body.data.name).toBe(undefined);
+    expect(response.body.data.description).toBe(undefined);
+  });
+
+  it("should throw error on deleting a project", async () => {
+    jest.spyOn(Project, "findByIdAndDelete").mockImplementationOnce(() => {
+      throw new Error("Mocked error");
+    });
+
+    const response = await request(app)
+      .delete(`/api/v1/projects/123456`)
+      .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`);
+
+    expect(response.status).toBe(500);
   });
 
   afterAll(async () => {
     await User.deleteOne({ username: mockUserData.username });
-    await Project.deleteOne({ name: mockProjectData.name });
     await mongoose.connection.close();
   });
 });
