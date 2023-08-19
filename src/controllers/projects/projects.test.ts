@@ -43,8 +43,6 @@ describe("Project Functional Tests", () => {
       .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`)
       .send(MOCK_PROJECT_DATA);
 
-    process.env.TEST_PROJECT_ID = response.body.data._id;
-
     expect(response.status).toBe(201);
     expect(response.body.success).toBe(true);
     expect(response.body.data).toBeDefined();
