@@ -8,7 +8,7 @@ export const createProject = async (
 ) => {
   try {
     const { name, description } = req.body;
-    const createdBy = (<any>req).user?._id;
+    const createdBy = (<any>req).user?.id;
 
     const project = await Project.create({
       name,
@@ -31,7 +31,7 @@ export const getProjects = async (
   next: NextFunction
 ) => {
   try {
-    const projects = await Project.find({ createdBy: (<any>req).user?._id });
+    const projects = await Project.find({ createdBy: (<any>req).user?.id });
 
     return res.status(200).json({
       success: true,
@@ -110,7 +110,7 @@ export const assignUserToProject = async (
   try {
     const { userId } = req.body;
 
-    if (userId === (<any>req).user?._id) {
+    if (userId === (<any>req).user?.id) {
       return res.status(400).json({
         success: false,
         message: "You cannot assign yourself to a project",

@@ -4,7 +4,7 @@ import app from "../../app";
 import User from "../../models/User/User";
 import Project from "../../models/Project/Project";
 
-import { mockUserData, mockProjectData } from "../../test/mock";
+import { MOCK_USER_DATA, MOCK_USER_2_DATA, MOCK_PROJECT_DATA } from "../../test/mock";
 
 describe("Project Functional Tests", () => {
   beforeAll(async () => {
@@ -12,11 +12,17 @@ describe("Project Functional Tests", () => {
 
     const response = await request(app)
       .post("/api/v1/auth/register")
-      .send(mockUserData);
+      .send(MOCK_USER_DATA);
 
-    const user = await User.findOne({ username: mockUserData.username });
+    const response2 = await request(app)
+      .post("/api/v1/auth/register")
+      .send(MOCK_USER_2_DATA);
+
+    const user = await User.findOne({ username: MOCK_USER_DATA.username });
+    const user2 = await User.findOne({ username: MOCK_USER_2_DATA.username });
 
     process.env.TEST_USER_ID = user?._id;
+    process.env.TEST_USER_2_ID = user2?._id;
     process.env.TEST_TOKEN = response.body.token;
     process.env.TEST_PROJECT_ID;
   });
@@ -26,14 +32,15 @@ describe("Project Functional Tests", () => {
     const response = await request(app)
       .post("/api/v1/projects/create")
       .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`)
-      .send(mockProjectData);
+      .send(MOCK_PROJECT_DATA);
 
     process.env.TEST_PROJECT_ID = response.body.data._id;
+
     expect(response.status).toBe(201);
     expect(response.body.success).toBe(true);
     expect(response.body.data).toBeDefined();
-    expect(response.body.data.name).toBe(mockProjectData.name);
-    expect(response.body.data.description).toBe(mockProjectData.description);
+    expect(response.body.data.name).toBe(MOCK_PROJECT_DATA.name);
+    expect(response.body.data.description).toBe(MOCK_PROJECT_DATA.description);
   });
 
   it("should throw error on project creation", async () => {
@@ -81,8 +88,8 @@ describe("Project Functional Tests", () => {
     expect(response.status).toBe(200);
     expect(response.body.success).toBe(true);
     expect(response.body.data).toBeDefined();
-    expect(response.body.data.name).toBe(mockProjectData.name);
-    expect(response.body.data.description).toBe(mockProjectData.description);
+    expect(response.body.data.name).toBe(MOCK_PROJECT_DATA.name);
+    expect(response.body.data.description).toBe(MOCK_PROJECT_DATA.description);
   });
 
   it("should throw error on getting a project", async () => {
@@ -101,7 +108,7 @@ describe("Project Functional Tests", () => {
   it("should assign a user to a project", async () => {
     const response = await request(app)
       .post(`/api/v1/projects/${process.env.TEST_PROJECT_ID}/assign/user`)
-      .send({ userId: process.env.TEST_USER_ID })
+      .send({ userId: process.env.TEST_USER_2_ID })
       .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`);
 
     expect(response.status).toBe(200);
@@ -120,6 +127,19 @@ describe("Project Functional Tests", () => {
       .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`);
 
     expect(response.status).toBe(500);
+  });
+
+  it("should not allow user to assign self to a project", async () => {
+    const response = await request(app)
+      .post(`/api/v1/projects/${process.env.TEST_PROJECT_ID}/assign/user`)
+      .send({ userId: process.env.TEST_USER_ID })
+      .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`);
+
+    expect(response.status).toBe(400);
+    expect(response.body.success).toBe(false);
+    expect(response.body.message).toBe(
+      "You cannot assign yourself to a project"
+    );
   });
 
   // Update Project ----------------------------------------------------------------------------------------------
@@ -181,7 +201,7 @@ describe("Project Functional Tests", () => {
   });
 
   afterAll(async () => {
-    await User.deleteOne({ username: mockUserData.username });
+    await User.deleteOne({ username: MOCK_USER_DATA.username });
     await mongoose.connection.close();
   });
 });
