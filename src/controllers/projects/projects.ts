@@ -110,8 +110,12 @@ export const assignUserToProject = async (
   try {
     const { userId } = req.body;
 
-    console.log(req.params.projectId, userId)
-    console.log(req.body)
+    if (userId === (<any>req).user?._id) {
+      return res.status(400).json({
+        success: false,
+        message: "You cannot assign yourself to a project",
+      });
+    }
 
     const project = await Project.findByIdAndUpdate(
       req.params.projectId,
