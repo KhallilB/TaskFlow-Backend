@@ -11,5 +11,6 @@ router.post("/create", isUserAuthorized, createProject);
 router.get("/", isUserAuthorized, getProjects);
 router.get("/:id", isUserAuthorized, getProject);
 router.put("/:id", isUserAuthorized, updateProject);
+router.delete("/:id", isUserAuthorized, updateProject);
 
 export default router;
