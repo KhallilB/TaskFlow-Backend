@@ -66,6 +66,20 @@ describe("Project Functional Tests", () => {
     expect(response.status).toBe(500);
   });
 
+  it("should get a project", async () => {
+    const project = await Project.findOne({ name: mockProjectData.name });
+
+    const response = await request(app)
+      .get(`/api/v1/projects/${project?._id}`)
+      .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.data).toBeDefined();
+    expect(response.body.data.name).toBe(mockProjectData.name);
+    expect(response.body.data.description).toBe(mockProjectData.description);
+  });
+
   afterAll(async () => {
     await User.deleteOne({ username: mockUserData.username });
     await Project.deleteOne({ name: mockProjectData.name });
