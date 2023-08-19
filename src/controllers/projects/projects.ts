@@ -24,3 +24,20 @@ export const createProject = async (
         next(error);
     }
 };
+
+export const getProjects = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    try {
+        const projects = await Project.find({ createdBy: (<any>req).user?._id });
+
+        return res.status(200).json({
+            success: true,
+            data: projects,
+        });
+    } catch (error: any) {
+        next(error);
+    }
+}
