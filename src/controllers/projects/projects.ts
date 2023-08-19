@@ -101,3 +101,28 @@ export const deleteProject = async (
     next(error);
   }
 };
+
+export const assignUserToProject = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { userId } = req.body;
+
+    const project = await Project.findByIdAndUpdate(
+      req.params.id,
+      {
+        $push: { users: userId },
+      },
+      { new: true }
+    );
+
+    return res.status(200).json({
+      success: true,
+      data: project,
+    });
+  } catch (error: any) {
+    next(error);
+  }
+};
