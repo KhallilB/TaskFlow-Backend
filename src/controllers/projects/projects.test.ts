@@ -33,7 +33,7 @@ describe("Project Functional Tests", () => {
   });
 
   afterEach(async () => {
-    jest.clearAllMocks();
+    jest.resetAllMocks();
   });
 
   // Create Project -----------------------------------------------------------------------------------------------
@@ -153,6 +153,24 @@ describe("Project Functional Tests", () => {
     );
   });
 
+  it("should not allow user to assign a user to a project more than once", async () => {
+    await request(app)
+      .post(`/api/v1/projects/${process.env.TEST_PROJECT_ID}/assign/user`)
+      .send({ userId: process.env.TEST_USER_2_ID })
+      .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`);
+
+    const response = await request(app)
+      .post(`/api/v1/projects/${process.env.TEST_PROJECT_ID}/assign/user`)
+      .send({ userId: process.env.TEST_USER_2_ID })
+      .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`);
+
+    expect(response.status).toBe(400);
+    expect(response.body.success).toBe(false);
+    expect(response.body.message).toBe(
+      "User is already assigned to this project"
+    );
+  });
+
   // Update Project ----------------------------------------------------------------------------------------------
   it("should update a project", async () => {
     const response = await request(app)
@@ -162,7 +180,7 @@ describe("Project Functional Tests", () => {
         name: "Updated Project",
         description: "Updated Project Description",
       });
-    
+
     expect(response.status).toBe(200);
     expect(response.body.success).toBe(true);
     expect(response.body.data).toBeDefined();
