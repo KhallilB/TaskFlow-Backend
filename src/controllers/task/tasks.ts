@@ -25,3 +25,21 @@ export const createTask = async (
         next(error);
     }
 };
+
+// Get all user tasks
+export const getTasks = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    try {
+        const tasks = await Task.find({ createdBy: (<any>req).user?.id });
+
+        res.status(200).json({
+            success: true,
+            data: tasks,
+        });
+    } catch (error: any) {
+        next(error);
+    }
+}
