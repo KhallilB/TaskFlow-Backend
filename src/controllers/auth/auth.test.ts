@@ -9,6 +9,7 @@ import { MOCK_USER_DATA } from "../../test/mock";
 describe("Registration v1", () => {
   beforeAll(async () => {
     await mongoose.connect(process.env.MONGO_URI!);
+    await User.deleteOne({ email: MOCK_USER_DATA.email });
   });
 
   afterEach(async () => {
