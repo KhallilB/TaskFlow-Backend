@@ -43,4 +43,13 @@ describe("Task Functional Tests", () => {
         expect(response.body.data.name).toBe(MOCK_TASK_DATA.name);
         expect(response.body.data.description).toBe(MOCK_TASK_DATA.description);
     });
+
+    it("should throw error on task create", async () => {
+        const response = await request(app)
+            .post("/api/v1/tasks/create")
+            .set("Authorization", `Bearer ${TEST_TOKEN}`)
+            .send({});
+
+        expect(response.status).toBe(500);
+    });
 });
