@@ -27,7 +27,7 @@ export const createTask = async (
 };
 
 // Get all user tasks
-export const getTasks = async (
+export const getAllTasks = async (
     req: Request,
     res: Response,
     next: NextFunction
