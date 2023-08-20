@@ -11,6 +11,10 @@ describe("Registration v1", () => {
     await mongoose.connect(process.env.MONGO_URI!);
   });
 
+  afterEach(async () => {
+    jest.resetAllMocks();
+  });
+
   it("should register a new user", async () => {
     const response = await request(app)
       .post("/api/v1/auth/register")
@@ -48,6 +52,10 @@ describe("Registration v1", () => {
 describe("Login v1", () => {
   beforeAll(async () => {
     await mongoose.connect(process.env.MONGO_URI!);
+  });
+
+  afterEach(async () => {
+    jest.resetAllMocks();
   });
 
   it("should login a user", async () => {
@@ -104,6 +112,10 @@ describe("Profile v1", () => {
       .send({ email: MOCK_USER_DATA.email, password: MOCK_USER_DATA.password });
 
     process.env.TEST_TOKEN = response.body.token;
+  });
+
+  afterEach(async () => {
+    jest.resetAllMocks();
   });
 
   it("should get profile", async () => {

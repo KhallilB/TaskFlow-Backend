@@ -8,6 +8,7 @@ import {
   MOCK_USER_DATA,
   MOCK_USER_2_DATA,
   MOCK_PROJECT_DATA,
+  MOCK_PROJECT_2_DATA
 } from "../../test/mock";
 
 describe("Project Functional Tests", () => {
@@ -29,7 +30,12 @@ describe("Project Functional Tests", () => {
     process.env.TEST_USER_ID = user?._id;
     process.env.TEST_USER_2_ID = user2?._id;
     process.env.TEST_TOKEN = response.body.token;
-    process.env.TEST_PROJECT_ID;
+  });
+
+  beforeEach(async () => { 
+    const project = new Project(MOCK_PROJECT_DATA);
+    await project.save();
+    process.env.TEST_PROJECT_ID = project._id;
   });
 
   afterEach(async () => {
@@ -41,13 +47,13 @@ describe("Project Functional Tests", () => {
     const response = await request(app)
       .post("/api/v1/projects/create")
       .set("Authorization", `Bearer ${process.env.TEST_TOKEN}`)
-      .send(MOCK_PROJECT_DATA);
+      .send(MOCK_PROJECT_2_DATA);
 
     expect(response.status).toBe(201);
     expect(response.body.success).toBe(true);
     expect(response.body.data).toBeDefined();
-    expect(response.body.data.name).toBe(MOCK_PROJECT_DATA.name);
-    expect(response.body.data.description).toBe(MOCK_PROJECT_DATA.description);
+    expect(response.body.data.name).toBe(MOCK_PROJECT_2_DATA.name);
+    expect(response.body.data.description).toBe(MOCK_PROJECT_2_DATA.description);
   });
 
   it("should throw error on project creation", async () => {
@@ -228,8 +234,11 @@ describe("Project Functional Tests", () => {
   });
 
   afterAll(async () => {
-    await User.deleteMany({
+    User.deleteMany({
       username: { $in: [MOCK_USER_DATA.username, MOCK_USER_2_DATA.username] },
+    });
+    Project.deleteMany({
+      name: { $in: [MOCK_PROJECT_DATA.name, MOCK_PROJECT_2_DATA.name] },
     });
     await mongoose.connection.close();
   });
