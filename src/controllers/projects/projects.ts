@@ -17,15 +17,11 @@ export const createProject = async (
       createdBy,
     });
 
-    return res.status(201).json({
+    res.status(201).json({
       success: true,
       data: project,
     });
   } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
     next(error);
   }
 };
@@ -39,15 +35,11 @@ export const getProjects = async (
   try {
     const projects = await Project.find({ createdBy: (<any>req).user?.id });
 
-    return res.status(200).json({
+    res.status(200).json({
       success: true,
       data: projects,
     });
   } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
     next(error);
   }
 };
@@ -61,15 +53,11 @@ export const getProject = async (
   try {
     const project = await Project.findById(req.params.projectId);
 
-    return res.status(200).json({
+    res.status(200).json({
       success: true,
       data: project,
     });
   } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
     next(error);
   }
 };
@@ -95,15 +83,11 @@ export const updateProject = async (
 
     const updatedProject = await project?.save();
 
-    return res.status(200).json({
+    res.status(200).json({
       success: true,
       data: updatedProject,
     });
   } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
     next(error);
   }
 };
@@ -117,15 +101,11 @@ export const deleteProject = async (
   try {
     await Project.findByIdAndDelete(req.params.projectId);
 
-    return res.status(200).json({
+    res.status(200).json({
       success: true,
       data: {},
     });
   } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
     next(error);
   }
 };
@@ -159,15 +139,11 @@ export const assignUserToProject = async (
     project?.assignedUsers.push(userId);
     const updatedProject = await project?.save();
 
-    return res.status(200).json({
+    res.status(200).json({
       success: true,
       data: updatedProject,
     });
   } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
     next(error);
   }
 };

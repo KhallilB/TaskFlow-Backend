@@ -41,10 +41,6 @@ export const register = async (
       data: user,
     });
   } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
     next(error);
   }
 };
@@ -82,10 +78,6 @@ export const login = async (
       data: user,
     });
   } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
     next(error);
   }
 };
@@ -156,10 +148,6 @@ export const updateProfile = async (
       });
     }
   } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    })
     next(error);
   }
 };
@@ -178,10 +166,6 @@ export const deleteProfile = async (
       data: {},
     });
   } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
     next(error);
   }
 };

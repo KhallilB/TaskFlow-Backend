@@ -18,3 +18,8 @@ export const MOCK_PROJECT_DATA = {
   name: "Test Project",
   description: "Test Project Description",
 };
+
+export const MOCK_PROJECT_2_DATA = {
+  name: "Test Project 2",
+  description: "Test Project 2 Description",
+};
