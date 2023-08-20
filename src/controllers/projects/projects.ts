@@ -88,6 +88,7 @@ export const updateProject = async (
       data: updatedProject,
     });
   } catch (error: any) {
+    console.log(error)
     next(error);
   }
 };
@@ -106,6 +107,7 @@ export const deleteProject = async (
       data: {},
     });
   } catch (error: any) {
+    console.log(error);
     next(error);
   }
 };
