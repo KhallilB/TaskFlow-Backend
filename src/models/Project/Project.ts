@@ -53,6 +53,7 @@ const projectSchema = new Schema<IProject, IProjectModel>(
       type: [Schema.Types.ObjectId],
       ref: "Task",
     },
+    // TODO: Add Milestones
   },
   {
     timestamps: true, // Adds createdAt and updatedAt timestamps

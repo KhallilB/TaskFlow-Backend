@@ -8,6 +8,7 @@ import "dotenv/config";
 
 import authRoutes from "./routes/auth";
 import projectRouter from "./routes/projects";
+import taskRouter from "./routes/tasks";
 
 const app = express();
 
@@ -22,6 +23,6 @@ app.use(
   })
 );
 
-app.use("/api/v1", [authRoutes, projectRouter]);
+app.use("/api/v1", [authRoutes, projectRouter, taskRouter]);
 
 export default app;
